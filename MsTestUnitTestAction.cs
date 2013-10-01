@@ -43,13 +43,13 @@ namespace Inedo.BuildMasterExtensions.MsTest
             string exitCode = ExecuteCommandLine(
                 this.MsTestExecutablePath,
                 args,
-                this.RemoteConfiguration.SourceDirectory
-            );
+                this.Context.SourceDirectory
+            ).ToString();
 
             var xmlDoc = new XmlDocument();
 
             //jr:Ignore/jr:XML/jr:namespaces
-            using (XmlTextReader tr = new XmlTextReader(Path.Combine(this.RemoteConfiguration.SourceDirectory, TestResultsFile)))
+            using (XmlTextReader tr = new XmlTextReader(Path.Combine(this.Context.SourceDirectory, TestResultsFile)))
             {
                 tr.Namespaces = false;
                 xmlDoc.Load(tr);
@@ -112,7 +112,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
             var args = new List<string>();
 
             // saves the results XML file to the source directory
-            args.Add(String.Format("/resultsfile:\"{0}\"", Path.Combine(this.RemoteConfiguration.SourceDirectory, TestResultsFile)));
+            args.Add(String.Format("/resultsfile:\"{0}\"", Path.Combine(this.Context.SourceDirectory, TestResultsFile)));
             
             // don't show copyright info & logo
             args.Add("/nologo");
@@ -122,7 +122,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
 
             // if there is a settings file relative to the source directory, use it
             if (!String.IsNullOrEmpty(this.TestSettingsFilePath))
-                args.Add(String.Format("/testsettings:\"{0}\"", Path.Combine(this.RemoteConfiguration.SourceDirectory, this.TestSettingsFilePath)));
+                args.Add(String.Format("/testsettings:\"{0}\"", Path.Combine(this.Context.SourceDirectory, this.TestSettingsFilePath)));
 
             // add any additional arguments
             args.Add(this.AdditionalArguments);
