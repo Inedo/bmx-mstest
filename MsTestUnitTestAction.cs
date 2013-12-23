@@ -11,8 +11,8 @@ namespace Inedo.BuildMasterExtensions.MsTest
 {
     [ActionProperties(
         "Execute MSTest Tests",
-        "Runs MSTest unit tests on a specified test project.",
-        "Testing")]
+        "Runs MSTest unit tests on a specified test project, recommended for tests in VS 2010 and earlier.")]
+    [Tag(Tags.UnitTests)]
     [CustomEditor(typeof(MsTestUnitTestActionEditor))]
     public sealed class MsTestUnitTestAction : UnitTestActionBase
     {

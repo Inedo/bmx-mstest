@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using Inedo.BuildMaster.Extensibility;
 
 [assembly: AssemblyTitle("MsTest")]
-[assembly: AssemblyDescription("Contains a unit testing action for running MsTest tests.")]
+[assembly: AssemblyDescription("Contains a unit testing action for running MsTest or VsTest.Console tests.")]
 
 [assembly: ComVisible(false)]
 [assembly: AssemblyCompany("Inedo, LLC")]
