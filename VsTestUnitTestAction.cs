@@ -4,11 +4,13 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Inedo.BuildMaster;
+using Inedo.BuildMaster.Data;
 using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Actions.Testing;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Files;
 using Inedo.BuildMaster.Web;
+using Inedo.Data;
 
 namespace Inedo.BuildMasterExtensions.MsTest
 {
@@ -86,7 +88,8 @@ namespace Inedo.BuildMasterExtensions.MsTest
             if (!fileOps.DirectoryExists(resultsPath))
                 throw new DirectoryNotFoundException("Could not find the generated \"TestResults\" directory after running unit tests at: " + resultsPath);
 
-            var resultsDir = fileOps.GetDirectoryEntry(new GetDirectoryEntryCommand()
+            var resultsDir = fileOps.GetDirectoryEntry(
+                new GetDirectoryEntryCommand()
                 {
                     Path = resultsPath,
                     Recurse = false,
@@ -109,26 +112,34 @@ namespace Inedo.BuildMasterExtensions.MsTest
                 foreach (var result in doc.Element("TestRun").Element("Results").Elements("UnitTestResult"))
                 {
                     string testName = result.Attribute("testName").Value;
-                    bool testPassed = result.Attribute("outcome").Value.Equals("Passed", StringComparison.OrdinalIgnoreCase);
+                    string outcome = result.Attribute("outcome").Value;
+                    var output = result.Element("Output");
                     string testResult;
-                    if (testPassed)
+                    bool? testPassed;                    
+                    if (outcome.Equals("Passed", StringComparison.OrdinalIgnoreCase))
                     {
+                        testPassed = true;
                         testResult = "Passed";
+                    }
+                    else if (outcome.Equals("NotExecuted", StringComparison.OrdinalIgnoreCase))
+                    {
+                        testPassed = null;
+                        if (output == null)
+                            testResult = "Ignored";
+                        else
+                            testResult = GetResultTextFromOutput(output);
                     }
                     else
                     {
-                        var errorInfo = result.Element("Output").Element("ErrorInfo");
-                        testResult = errorInfo.Element("Message").Value;
-                        var trace = errorInfo.Element("StackTrace");
-                        if (trace != null)
-                            testResult += Environment.NewLine + trace.Value;
+                        testPassed = false;
+                        testResult = GetResultTextFromOutput(output);
                     }
                     string startDate = result.Attribute("startTime").Value;
                     string endDate = result.Attribute("endTime").Value;
 
-                    this.RecordResult(
-                        testName, 
-                        testPassed, 
+                    this.CustomRecordResult(
+                        testName,
+                        testPassed,
                         testResult,
                         DateTime.Parse(startDate),
                         DateTime.Parse(endDate)
@@ -137,7 +148,37 @@ namespace Inedo.BuildMasterExtensions.MsTest
             }
         }
 
-        private new MsTestConfigurer GetExtensionConfigurer() 
+        private static string GetResultTextFromOutput(XElement output)
+        {
+            string message = "";
+            var errorInfo = output.Element("ErrorInfo");
+            if (errorInfo != null)
+            {
+                message = errorInfo.Element("Message").Value;
+                var trace = errorInfo.Element("StackTrace");
+                if (trace != null)
+                    message += Environment.NewLine + trace.Value;
+            }
+            return message;
+        }
+
+        /// <remarks>
+        /// Not using the base class RecordResult because it doesn't support Inconclusive yet
+        /// </remarks>
+        private void CustomRecordResult(string testName, bool? testPassed, string testResult, DateTime startTime, DateTime endTime)        
+        {
+            StoredProcs.BuildTestResults_RecordTestResult(
+                this.Context.ExecutionPlanActionId,
+                this.GroupName,
+                testName,
+                testPassed == null ? null : (bool)testPassed ? "Y" : "N",
+                testResult,
+                startTime,
+                endTime
+            ).Execute();
+        }
+
+        private new MsTestConfigurer GetExtensionConfigurer()
         {
             return (MsTestConfigurer)base.GetExtensionConfigurer();
         }
