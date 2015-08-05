@@ -10,7 +10,6 @@ using Inedo.BuildMaster.Extensibility.Actions.Testing;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Files;
 using Inedo.BuildMaster.Web;
-using Inedo.Data;
 
 namespace Inedo.BuildMasterExtensions.MsTest
 {
@@ -19,6 +18,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
        "Runs VSTest unit tests on a specified test project, recommended for tests in VS 2012 and later.")]
     [Tag(Tags.UnitTests)]
     [CustomEditor(typeof(VsTestUnitTestActionEditor))]
+    [RequiresInterface(typeof(IFileOperationsExecuter))]
     public sealed class VsTestUnitTestAction : UnitTestActionBase
     {
         /// <summary>
@@ -47,10 +47,10 @@ namespace Inedo.BuildMasterExtensions.MsTest
         public bool ClearExistingTestResults { get; set; }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
+        /// A <see cref="string" /> that represents this instance.
         /// </returns>
         /// <remarks>
         /// This should return a user-friendly string describing what the Action does
@@ -58,7 +58,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
         /// </remarks>
         public override string ToString()
         {
-            return string.Format("Run VSTest tests on {0}", this.TestContainer);
+            return $"Run VSTest tests on {this.TestContainer}";
         }
 
         protected override void RunTests()
@@ -75,13 +75,13 @@ namespace Inedo.BuildMasterExtensions.MsTest
 
             if (this.ClearExistingTestResults)
             {
-                this.LogDebug("Clearing {0} directory...", resultsPath);
+                this.LogDebug($"Clearing {resultsPath} directory...");
                 fileOps.ClearFolder(resultsPath);
             }
 
             this.ExecuteCommandLine(
                 configurer.VsTestPath,
-                string.Format("{0} /logger:trx {1}", this.TestContainer, this.AdditionalArguments),
+                $"{this.TestContainer} /logger:trx {this.AdditionalArguments}",
                 this.Context.SourceDirectory
             );
 
