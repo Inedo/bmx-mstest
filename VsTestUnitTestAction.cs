@@ -21,49 +21,32 @@ namespace Inedo.BuildMasterExtensions.MsTest
     [RequiresInterface(typeof(IFileOperationsExecuter))]
     public sealed class VsTestUnitTestAction : UnitTestActionBase
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VsTestUnitTestAction"/> class.
-        /// </summary>
-        public VsTestUnitTestAction()
-        {
-        }
-
-        /// <summary>
-        /// Gets or sets the test container.
-        /// </summary>
         [Persistent]
         public string TestContainer { get; set; }
 
-        /// <summary>
-        /// Gets or sets the additional arguments.
-        /// </summary>
         [Persistent]
         public string AdditionalArguments { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether [clear existing test results].
-        /// </summary>
         [Persistent]
         public bool ClearExistingTestResults { get; set; }
 
-        /// <summary>
-        /// Returns a <see cref="string" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="string" /> that represents this instance.
-        /// </returns>
-        /// <remarks>
-        /// This should return a user-friendly string describing what the Action does
-        /// and the state of its important persistent properties.
-        /// </remarks>
-        public override string ToString()
+        public override ActionDescription GetActionDescription()
         {
-            return $"Run VSTest tests on {this.TestContainer}";
+            return new ActionDescription(
+                new ShortActionDescription(
+                    "Run VSTest tests on ",
+                    new Hilite(this.TestContainer)
+                ),
+                new LongActionDescription(
+                    "in ",
+                    new DirectoryHilite(this.OverriddenSourceDirectory)
+                )
+            );
         }
 
         protected override void RunTests()
         {
-            var configurer = this.GetExtensionConfigurer();
+            var configurer = (MsTestConfigurer)this.GetExtensionConfigurer();
             if (configurer == null || string.IsNullOrEmpty(configurer.VsTestPath))
                 throw new InvalidOperationException("To run VSTests, the path to vstest.console.exe must be set in the MsTest extension's configuration.");
 
@@ -111,19 +94,20 @@ namespace Inedo.BuildMasterExtensions.MsTest
                 var doc = XDocument.Load(reader);
                 foreach (var result in doc.Element("TestRun").Element("Results").Elements("UnitTestResult"))
                 {
-                    string testName = result.Attribute("testName").Value;
-                    string outcome = result.Attribute("outcome").Value;
+                    var testName = (string)result.Attribute("testName");
+                    var outcome = (string)result.Attribute("outcome");
                     var output = result.Element("Output");
+                    string testStatusCode;
                     string testResult;
-                    bool? testPassed;                    
-                    if (outcome.Equals("Passed", StringComparison.OrdinalIgnoreCase))
+
+                    if (string.Equals(outcome, "Passed", StringComparison.OrdinalIgnoreCase))
                     {
-                        testPassed = true;
+                        testStatusCode = Domains.TestStatusCodes.Passed;
                         testResult = "Passed";
                     }
-                    else if (outcome.Equals("NotExecuted", StringComparison.OrdinalIgnoreCase))
+                    else if (string.Equals(outcome, "NotExecuted", StringComparison.OrdinalIgnoreCase))
                     {
-                        testPassed = null;
+                        testStatusCode = Domains.TestStatusCodes.Inconclusive;
                         if (output == null)
                             testResult = "Ignored";
                         else
@@ -131,56 +115,31 @@ namespace Inedo.BuildMasterExtensions.MsTest
                     }
                     else
                     {
-                        testPassed = false;
+                        testStatusCode = Domains.TestStatusCodes.Failed;
                         testResult = GetResultTextFromOutput(output);
                     }
-                    string startDate = result.Attribute("startTime").Value;
-                    string endDate = result.Attribute("endTime").Value;
 
-                    this.CustomRecordResult(
-                        testName,
-                        testPassed,
-                        testResult,
-                        DateTime.Parse(startDate),
-                        DateTime.Parse(endDate)
-                    );
+                    var startDate = (DateTime)result.Attribute("startTime");
+                    var endDate = (DateTime)result.Attribute("endTime");
+
+                    this.RecordResult(testName, testStatusCode, testResult, startDate, endDate);
                 }
             }
         }
 
         private static string GetResultTextFromOutput(XElement output)
         {
-            string message = "";
+            var message = string.Empty;
             var errorInfo = output.Element("ErrorInfo");
             if (errorInfo != null)
             {
-                message = errorInfo.Element("Message").Value;
-                var trace = errorInfo.Element("StackTrace");
-                if (trace != null)
-                    message += Environment.NewLine + trace.Value;
+                message = (string)errorInfo.Element("Message");
+                var trace = (string)errorInfo.Element("StackTrace");
+                if (!string.IsNullOrEmpty(trace))
+                    message += Environment.NewLine + trace;
             }
+
             return message;
-        }
-
-        /// <remarks>
-        /// Not using the base class RecordResult because it doesn't support Inconclusive yet
-        /// </remarks>
-        private void CustomRecordResult(string testName, bool? testPassed, string testResult, DateTime startTime, DateTime endTime)        
-        {
-            StoredProcs.BuildTestResults_RecordTestResult(
-                this.Context.ExecutionPlanActionId,
-                this.GroupName,
-                testName,
-                testPassed == null ? null : (bool)testPassed ? "Y" : "N",
-                testResult,
-                startTime,
-                endTime
-            ).Execute();
-        }
-
-        private new MsTestConfigurer GetExtensionConfigurer()
-        {
-            return (MsTestConfigurer)base.GetExtensionConfigurer();
         }
     }
 }

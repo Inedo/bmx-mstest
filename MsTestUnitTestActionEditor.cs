@@ -7,7 +7,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
 {
     internal sealed class MsTestUnitTestActionEditor : ActionEditorBase
     {
-        public override bool DisplaySourceDirectory { get { return true; } }
+        public override bool DisplaySourceDirectory => true;
 
         private SourceControlFileFolderPicker txtExecutablePath;
         private ValidatingTextBox txtTestFile, txtGroupName, txtTestSettingsFilePath, txtAdditionalArguments;
@@ -32,7 +32,8 @@ namespace Inedo.BuildMasterExtensions.MsTest
             
             this.txtAdditionalArguments = new ValidatingTextBox() { Width = 300 };
 
-            CUtil.Add(this,
+#pragma warning disable CS0618 // Type or member is obsolete
+            this.Controls.Add(
                  new FormFieldGroup("MSTest Executable Path",
                     "The path of the MSTest executable on the remote server.",
                     false,
@@ -59,6 +60,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
                      new StandardFormField("Group Name:", txtGroupName)
                  )
             );
+#pragma warning restore CS0618 // Type or member is obsolete
 
             base.CreateChildControls();
         }
