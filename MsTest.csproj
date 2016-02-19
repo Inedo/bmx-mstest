@@ -69,6 +69,7 @@
     <Compile Include="Legacy\MsTestUnitTestActionEditor.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Operations\VsTestOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Legacy\VsTestUnitTestAction.cs" />
     <Compile Include="Legacy\VsTestUnitTestActionEditor.cs">
