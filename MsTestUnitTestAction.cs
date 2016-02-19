@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Xml;
 using Inedo.BuildMaster;
-using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Actions.Testing;
 using Inedo.BuildMaster.Web;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.MsTest
 {
-    [ActionProperties(
-        "Execute MSTest Tests",
-        "Runs MSTest unit tests on a specified test project, recommended for tests in VS 2010 and earlier.")]
+    [DisplayName("Execute MSTest Tests")]
+    [Description("Runs MSTest unit tests on a specified test project, recommended for tests in VS 2010 and earlier.")]
     [Tag(Tags.UnitTests)]
     [CustomEditor(typeof(MsTestUnitTestActionEditor))]
     public sealed class MsTestUnitTestAction : UnitTestActionBase
@@ -28,7 +28,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
         public string TestSettingsFilePath { get; set; }
 
         [Persistent]
-        public string AdditionalArguments {get; set;}
+        public string AdditionalArguments { get; set; }
 
         private static class MsTestStatuses
         {
@@ -113,26 +113,23 @@ namespace Inedo.BuildMasterExtensions.MsTest
 
             // saves the results XML file to the source directory
             args.Add(String.Format("/resultsfile:\"{0}\"", Path.Combine(this.Context.SourceDirectory, TestResultsFile)));
-            
+
             // don't show copyright info & logo
             args.Add("/nologo");
 
             // specify which assembly to test
-            args.Add(String.Format("/testcontainer:\"{0}\"", this.TestFile));
+            args.Add(string.Format("/testcontainer:\"{0}\"", this.TestFile));
 
             // if there is a settings file relative to the source directory, use it
-            if (!String.IsNullOrEmpty(this.TestSettingsFilePath))
-                args.Add(String.Format("/testsettings:\"{0}\"", Path.Combine(this.Context.SourceDirectory, this.TestSettingsFilePath)));
+            if (!string.IsNullOrEmpty(this.TestSettingsFilePath))
+                args.Add(string.Format("/testsettings:\"{0}\"", Path.Combine(this.Context.SourceDirectory, this.TestSettingsFilePath)));
 
             // add any additional arguments
             args.Add(this.AdditionalArguments);
 
-            return String.Join(" ", args.ToArray());
+            return string.Join(" ", args.ToArray());
         }
 
-        public override string ToString()
-        {
-            return String.Format("Run MSTest tests on {0}", this.TestFile);
-        }
+        public override string ToString() => "Run MSTest tests on " + this.TestFile;
     }
 }

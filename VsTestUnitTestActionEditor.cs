@@ -25,7 +25,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
 
         public override ActionBase CreateFromForm()
         {
-            return new VsTestUnitTestAction()
+            return new VsTestUnitTestAction
             {
                 TestContainer = PathEx.GetFileName(this.txtContainer.Text),
                 OverriddenSourceDirectory = PathEx.GetDirectoryName(this.txtContainer.Text),

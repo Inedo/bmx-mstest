@@ -1,21 +1,22 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Inedo.BuildMaster;
 using Inedo.BuildMaster.Data;
-using Inedo.BuildMaster.Extensibility.Actions;
+using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Extensibility.Actions.Testing;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Files;
 using Inedo.BuildMaster.Web;
+using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.MsTest
 {
-    [ActionProperties(
-       "Execute VSTest Tests",
-       "Runs VSTest unit tests on a specified test project, recommended for tests in VS 2012 and later.")]
+    [DisplayName("Execute VSTest Tests")]
+    [Description("Runs VSTest unit tests on a specified test project, recommended for tests in VS 2012 and later.")]
     [Tag(Tags.UnitTests)]
     [CustomEditor(typeof(VsTestUnitTestActionEditor))]
     [RequiresInterface(typeof(IFileOperationsExecuter))]
@@ -30,14 +31,14 @@ namespace Inedo.BuildMasterExtensions.MsTest
         [Persistent]
         public bool ClearExistingTestResults { get; set; }
 
-        public override ActionDescription GetActionDescription()
+        public override ExtendedRichDescription GetActionDescription()
         {
-            return new ActionDescription(
-                new ShortActionDescription(
+            return new ExtendedRichDescription(
+                new RichDescription(
                     "Run VSTest tests on ",
                     new Hilite(this.TestContainer)
                 ),
-                new LongActionDescription(
+                new RichDescription(
                     "in ",
                     new DirectoryHilite(this.OverriddenSourceDirectory)
                 )

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Inedo.BuildMasterExtensions.MsTest</RootNamespace>
     <AssemblyName>MsTest</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
     </SccProjectName>
@@ -30,6 +30,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,28 +39,22 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BuildMaster.Web.Controls, Version=4.9.0.133, Culture=neutral, PublicKeyToken=112cfb71329714a6, processorArchitecture=MSIL">
-      <HintPath>packages\Inedo.BuildMaster.SDK.4.9\lib\net40\BuildMaster.Web.Controls.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="BuildMaster.Web.Controls, Version=5.0.0.3, Culture=neutral, PublicKeyToken=112cfb71329714a6, processorArchitecture=MSIL">
+      <HintPath>packages\Inedo.BuildMaster.SDK.5.0\lib\net45\BuildMaster.Web.Controls.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BuildMasterCore, Version=4.9.0.133, Culture=neutral, PublicKeyToken=112cfb71329714a6, processorArchitecture=MSIL">
-      <HintPath>packages\Inedo.BuildMaster.SDK.4.9\lib\net40\BuildMasterCore.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="BuildMasterCore, Version=5.0.0.3, Culture=neutral, PublicKeyToken=112cfb71329714a6, processorArchitecture=MSIL">
+      <HintPath>packages\Inedo.BuildMaster.SDK.5.0\lib\net45\BuildMasterCore.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="InedoLib, Version=254.1.0.0, Culture=neutral, PublicKeyToken=112cfb71329714a6, processorArchitecture=MSIL">
-      <HintPath>packages\Inedo.BuildMaster.SDK.4.9\lib\net40\InedoLib.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="InedoLib, Version=304.2.0.0, Culture=neutral, PublicKeyToken=112cfb71329714a6, processorArchitecture=MSIL">
+      <HintPath>packages\Inedo.BuildMaster.SDK.5.0\lib\net45\InedoLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
