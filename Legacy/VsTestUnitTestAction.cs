@@ -7,10 +7,12 @@ using System.Xml.Linq;
 using Inedo.BuildMaster;
 using Inedo.BuildMaster.Data;
 using Inedo.BuildMaster.Documentation;
+using Inedo.BuildMaster.Extensibility.Actions;
 using Inedo.BuildMaster.Extensibility.Actions.Testing;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Files;
 using Inedo.BuildMaster.Web;
+using Inedo.BuildMasterExtensions.MsTest.ActionImporters;
 using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.MsTest
@@ -20,6 +22,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
     [Tag(Tags.UnitTests)]
     [CustomEditor(typeof(VsTestUnitTestActionEditor))]
     [RequiresInterface(typeof(IFileOperationsExecuter))]
+    [ConvertibleToOperation(typeof(VsTestImporter))]
     public sealed class VsTestUnitTestAction : UnitTestActionBase
     {
         [Persistent]

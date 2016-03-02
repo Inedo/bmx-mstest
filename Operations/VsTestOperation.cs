@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -20,6 +21,7 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
     [Description("Runs VSTest unit tests on a specified test project, recommended for tests in VS 2012 and later.")]
     public sealed class VsTestOperation : ExecuteOperation
     {
+        [Required]
         [ScriptAlias("TestContainer")]
         public string TestContainer { get; set; }
 
@@ -29,11 +31,14 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
         [ScriptAlias("ClearExistingTestResults")]
         public bool ClearExistingTestResults { get; set; }
 
+        [Required]
         [ScriptAlias("Group")]
         public string TestGroup { get; set; }
 
+        [Required]
         [ScriptAlias("VsTestPath")]
         [DisplayName("VSTest Path")]
+        [DefaultValue("$VSTestExePath")]
         [Description(@"The path to vstest.console.exe, typically: <br /><br />"
     + @"""C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions "
     + @"\Microsoft\TestWindow\vstest.console.exe""")]
@@ -41,12 +46,11 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
 
         public override async Task ExecuteAsync(IOperationExecutionContext context)
         {
-            var fileOps = context.Agent.GetService<IFileOperationsExecuter>();
-            if (!fileOps.FileExists(this.VsTestPath))
-            {
-                this.LogError("Could not find the file vstest.console.exe; ensure that the MsTest extensions's configuration is correct before continuing.");
+            var vsTestPath = this.GetVsTestPath(context);
+            if (string.IsNullOrEmpty(vsTestPath))
                 return;
-            }
+
+            var fileOps = context.Agent.GetService<IFileOperationsExecuter>();
 
             var containerPath = context.ResolvePath(this.TestContainer);
             var sourceDirectory = PathEx.GetDirectoryName(containerPath);
@@ -62,7 +66,7 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
                 context,
                 new AgentProcessStartInfo
                 {
-                    FileName = this.VsTestPath,
+                    FileName = vsTestPath,
                     Arguments = $"\"{this.TestContainer}\" /logger:trx {this.AdditionalArguments}",
                     WorkingDirectory = sourceDirectory
                 }
@@ -147,6 +151,33 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
             );
         }
 
+        private string GetVsTestPath(IOperationExecutionContext context)
+        {
+            if (string.IsNullOrWhiteSpace(this.VsTestPath))
+            {
+                this.LogDebug("$VSTestExePath variable is not defined; attempting to locate vstest.console.exe...");
+                var vsTestPath = context.Agent.GetService<IRemoteMethodExecuter>().InvokeFunc(FindVsTestExe);
+                if (string.IsNullOrEmpty(vsTestPath))
+                {
+                    this.LogError("Unable to find vstest.console.exe. Verify that VSTest is installed and set a $VSTestExePath server variable to its full path.");
+                    return null;
+                }
+
+                return vsTestPath;
+            }
+            else
+            {
+                this.LogDebug("VSTestExePath = " + this.VsTestPath);
+                if (!context.Agent.GetService<IFileOperationsExecuter>().FileExists(this.VsTestPath))
+                {
+                    this.LogError($"The file {this.VsTestPath} does not exist. Verify that VSTest is installed.");
+                    return null;
+                }
+
+                return this.VsTestPath;
+            }
+        }
+
         private static string GetResultTextFromOutput(XElement output)
         {
             var message = string.Empty;
@@ -160,6 +191,25 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
             }
 
             return message;
+        }
+
+        private static string FindVsTestExe()
+        {
+            var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            var visualStudioDirs = (from d in Directory.EnumerateDirectories(programFiles)
+                                    let m = Regex.Match(d, @"\\Microsoft Visual Studio (?<1>[0-9](\.[0-9])?)$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture)
+                                    where m.Success
+                                    orderby decimal.Parse(m.Groups[1].Value) descending
+                                    select d);
+
+            foreach (var vsDir in visualStudioDirs)
+            {
+                var vsTestExePath = Path.Combine(programFiles, vsDir, "Common7", "IDE", "CommonExtensions", "Microsoft", "TestWindow", "vstest.console.exe");
+                if (File.Exists(vsTestExePath))
+                    return vsTestExePath;
+            }
+
+            return null;
         }
     }
 }

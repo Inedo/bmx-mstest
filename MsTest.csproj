@@ -64,6 +64,8 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Functions\VSTestExePathVariableFunction.cs" />
+    <Compile Include="Legacy\ActionImporters\VsTestImporter.cs" />
     <Compile Include="Legacy\MsTestConfigurer.cs" />
     <Compile Include="Legacy\MsTestUnitTestAction.cs" />
     <Compile Include="Legacy\MsTestUnitTestActionEditor.cs">
