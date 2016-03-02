@@ -197,14 +197,14 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
         {
             var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
             var visualStudioDirs = (from d in Directory.EnumerateDirectories(programFiles)
-                                    let m = Regex.Match(d, @"\\Microsoft Visual Studio (?<1>[0-9](\.[0-9])?)$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture)
+                                    let m = Regex.Match(d, @"\\Microsoft Visual Studio (?<1>[0-9]+(\.[0-9]+)?)$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture)
                                     where m.Success
                                     orderby decimal.Parse(m.Groups[1].Value) descending
                                     select d);
 
             foreach (var vsDir in visualStudioDirs)
             {
-                var vsTestExePath = Path.Combine(programFiles, vsDir, "Common7", "IDE", "CommonExtensions", "Microsoft", "TestWindow", "vstest.console.exe");
+                var vsTestExePath = Path.Combine(vsDir, "Common7", "IDE", "CommonExtensions", "Microsoft", "TestWindow", "vstest.console.exe");
                 if (File.Exists(vsTestExePath))
                     return vsTestExePath;
             }
