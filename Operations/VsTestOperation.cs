@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Inedo.BuildMaster.Data;
-using Inedo.BuildMaster.Documentation;
 using Inedo.BuildMaster.Extensibility;
 using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.Diagnostics;
+using Inedo.Documentation;
 using Inedo.IO;
 
 namespace Inedo.BuildMasterExtensions.MsTest.Operations
