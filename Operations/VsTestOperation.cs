@@ -23,17 +23,25 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
     {
         [Required]
         [ScriptAlias("TestContainer")]
+        [DisplayName("Test container")]
+        [Description("The file name of the test container assembly.")]
         public string TestContainer { get; set; }
-
-        [ScriptAlias("Arguments")]
-        public string AdditionalArguments { get; set; }
-
-        [ScriptAlias("ClearExistingTestResults")]
-        public bool ClearExistingTestResults { get; set; }
 
         [Required]
         [ScriptAlias("Group")]
+        [DisplayName("Test group")]
+        [Description("The BuildMaster unit test group to record these tests in.")]
         public string TestGroup { get; set; }
+
+        [ScriptAlias("Arguments")]
+        [DisplayName("Additional arguments")]
+        [Description("Additional arguments that will be passed to vstest.")]
+        public string AdditionalArguments { get; set; }
+
+        [ScriptAlias("ClearExistingTestResults")]
+        [DisplayName("Clear existing results")]
+        [Description("When true, the test results directory will be cleared before the tests are run.")]
+        public bool ClearExistingTestResults { get; set; }
 
         [Required]
         [ScriptAlias("VsTestPath")]
@@ -99,45 +107,48 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
                 doc = XDocument.Load(reader);
             }
 
-            foreach (var result in doc.Element("TestRun").Element("Results").Elements("UnitTestResult"))
+            using (var db = new DB.Context())
             {
-                var testName = (string)result.Attribute("testName");
-                var outcome = (string)result.Attribute("outcome");
-                var output = result.Element("Output");
-                string testStatusCode;
-                string testResult;
+                foreach (var result in doc.Element("TestRun").Element("Results").Elements("UnitTestResult"))
+                {
+                    var testName = (string)result.Attribute("testName");
+                    var outcome = (string)result.Attribute("outcome");
+                    var output = result.Element("Output");
+                    string testStatusCode;
+                    string testResult;
 
-                if (string.Equals(outcome, "Passed", StringComparison.OrdinalIgnoreCase))
-                {
-                    testStatusCode = Domains.TestStatusCodes.Passed;
-                    testResult = "Passed";
-                }
-                else if (string.Equals(outcome, "NotExecuted", StringComparison.OrdinalIgnoreCase))
-                {
-                    testStatusCode = Domains.TestStatusCodes.Inconclusive;
-                    if (output == null)
-                        testResult = "Ignored";
+                    if (string.Equals(outcome, "Passed", StringComparison.OrdinalIgnoreCase))
+                    {
+                        testStatusCode = Domains.TestStatusCodes.Passed;
+                        testResult = "Passed";
+                    }
+                    else if (string.Equals(outcome, "NotExecuted", StringComparison.OrdinalIgnoreCase))
+                    {
+                        testStatusCode = Domains.TestStatusCodes.Inconclusive;
+                        if (output == null)
+                            testResult = "Ignored";
+                        else
+                            testResult = GetResultTextFromOutput(output);
+                    }
                     else
+                    {
+                        testStatusCode = Domains.TestStatusCodes.Failed;
                         testResult = GetResultTextFromOutput(output);
-                }
-                else
-                {
-                    testStatusCode = Domains.TestStatusCodes.Failed;
-                    testResult = GetResultTextFromOutput(output);
-                }
+                    }
 
-                var startDate = (DateTime)result.Attribute("startTime");
-                var endDate = (DateTime)result.Attribute("endTime");
+                    var startDate = (DateTime)result.Attribute("startTime");
+                    var endDate = (DateTime)result.Attribute("endTime");
 
-                DB.BuildTestResults_RecordTestResult(
-                    Execution_Id: context.ExecutionId,
-                    Group_Name: this.TestGroup,
-                    Test_Name: testName,
-                    TestStatus_Code: testStatusCode,
-                    TestResult_Text: testResult,
-                    TestStarted_Date: startDate,
-                    TestEnded_Date: endDate
-                );
+                    await db.BuildTestResults_RecordTestResultAsync(
+                        Execution_Id: context.ExecutionId,
+                        Group_Name: this.TestGroup,
+                        Test_Name: testName,
+                        TestStatus_Code: testStatusCode,
+                        TestResult_Text: testResult,
+                        TestStarted_Date: startDate,
+                        TestEnded_Date: endDate
+                    );
+                }
             }
         }
 
@@ -146,7 +157,7 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
             return new ExtendedRichDescription(
                 new RichDescription(
                     "Run VSTest on ",
-                    new DirectoryHilite(this.TestContainer)
+                    new DirectoryHilite(config[nameof(this.TestContainer)])
                 )
             );
         }
