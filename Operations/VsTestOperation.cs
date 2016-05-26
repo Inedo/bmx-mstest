@@ -43,7 +43,6 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
         [Description("When true, the test results directory will be cleared before the tests are run.")]
         public bool ClearExistingTestResults { get; set; }
 
-        [Required]
         [ScriptAlias("VsTestPath")]
         [DisplayName("VSTest Path")]
         [DefaultValue("$VSTestExePath")]
