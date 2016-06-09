@@ -6,9 +6,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Inedo.Agents;
 using Inedo.BuildMaster.Data;
 using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.Agents;
 using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
@@ -66,12 +66,12 @@ namespace Inedo.BuildMasterExtensions.MsTest.Operations
             if (this.ClearExistingTestResults)
             {
                 this.LogDebug($"Clearing {resultsPath} directory...");
-                fileOps.ClearFolder(resultsPath);
+                fileOps.ClearDirectory(resultsPath);
             }
 
             await this.ExecuteCommandLineAsync(
                 context,
-                new AgentProcessStartInfo
+                new RemoteProcessStartInfo
                 {
                     FileName = vsTestPath,
                     Arguments = $"\"{this.TestContainer}\" /logger:trx {this.AdditionalArguments}",

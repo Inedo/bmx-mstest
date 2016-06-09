@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using Inedo.Agents;
 using Inedo.BuildMaster;
 using Inedo.BuildMaster.Data;
 using Inedo.BuildMaster.Extensibility.Actions;
@@ -63,7 +64,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
             if (this.ClearExistingTestResults)
             {
                 this.LogDebug($"Clearing {resultsPath} directory...");
-                fileOps.ClearFolder(resultsPath);
+                fileOps.ClearDirectory(resultsPath);
             }
 
             this.ExecuteCommandLine(
