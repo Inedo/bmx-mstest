@@ -8,10 +8,10 @@ using System.Xml;
 using System.Xml.Linq;
 using Inedo.Agents;
 using Inedo.BuildMaster.Data;
-using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.Operations;
 using Inedo.Diagnostics;
 using Inedo.Documentation;
+using Inedo.Extensibility;
+using Inedo.Extensibility.Operations;
 using Inedo.IO;
 
 namespace Inedo.BuildMasterExtensions.MsTest.Operations

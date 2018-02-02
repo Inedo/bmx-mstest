@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Xml;
-using Inedo.BuildMaster;
 using Inedo.BuildMaster.Extensibility.Actions.Testing;
-using Inedo.BuildMaster.Web;
-using Inedo.Documentation;
 using Inedo.Serialization;
+using Inedo.Web;
 
 namespace Inedo.BuildMasterExtensions.MsTest
 {
     [DisplayName("Execute MSTest Tests")]
     [Description("Runs MSTest unit tests on a specified test project, recommended for tests in VS 2010 and earlier.")]
-    [Tag(Tags.UnitTests)]
     [CustomEditor(typeof(MsTestUnitTestActionEditor))]
     public sealed class MsTestUnitTestAction : UnitTestActionBase
     {

@@ -1,16 +1,14 @@
 ﻿using System.ComponentModel;
-using Inedo.BuildMaster.Extensibility;
-using Inedo.BuildMaster.Extensibility.VariableFunctions;
+using Inedo.Extensibility;
+using Inedo.Extensibility.VariableFunctions;
 
 namespace Inedo.BuildMasterExtensions.MsTest.Functions
 {
     [ScriptAlias("VSTestExePath")]
-    [Description("Placeholder. Will be implemented in a future version.")]
-    [VariableFunctionProperties(
-        Category = "Server",
-        Scope = VariableFunctionScope.Server)]
-    public sealed class VSTestExePathVariableFunction : ScalarVariableFunctionBase
+    [Description("The path to vstest.console.exe; if unspecified, the operation will attempt to find it in the Visual Studio installation path.")]
+    [ExtensionConfigurationVariable(Required = false)]
+    public sealed class VSTestExePathVariableFunction : ScalarVariableFunction
     {
-        protected override object EvaluateScalar(IGenericBuildMasterContext context) => string.Empty;
+        protected override object EvaluateScalar(IVariableFunctionContext context) => string.Empty;
     }
 }

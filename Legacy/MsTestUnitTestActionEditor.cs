@@ -1,6 +1,6 @@
 ﻿using Inedo.BuildMaster.Extensibility.Actions;
-using Inedo.BuildMaster.Web.Controls;
 using Inedo.BuildMaster.Web.Controls.Extensions;
+using Inedo.Web;
 using Inedo.Web.Controls;
 
 namespace Inedo.BuildMasterExtensions.MsTest
@@ -9,15 +9,15 @@ namespace Inedo.BuildMasterExtensions.MsTest
     {
         public override bool DisplaySourceDirectory => true;
 
-        private SourceControlFileFolderPicker txtExecutablePath;
+        private FileBrowserTextBox txtExecutablePath;
         private ValidatingTextBox txtTestFile, txtGroupName, txtTestSettingsFilePath, txtAdditionalArguments;
 
         protected override void CreateChildControls()
         {
-            this.txtExecutablePath = new SourceControlFileFolderPicker
+            this.txtExecutablePath = new FileBrowserTextBox
             {
                 ServerId = this.ServerId,
-                DisplayMode = SourceControlBrowser.DisplayModes.FoldersAndFiles
+                IncludeFiles = true
             };
 
             this.txtTestFile = new ValidatingTextBox
