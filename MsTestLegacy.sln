@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsTest", "MsTest.csproj", "{93358633-6973-4584-87ED-6DC336FFD596}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsTestLegacy", "MsTestLegacy.csproj", "{93358633-6973-4584-87ED-6DC336FFD596}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

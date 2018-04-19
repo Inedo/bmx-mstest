@@ -6,6 +6,7 @@ using Inedo.Serialization;
 
 namespace Inedo.BuildMasterExtensions.MsTest
 {
+    [PersistFrom("Inedo.BuildMasterExtensions.MsTest.MsTestConfigurer,MsTest")]
     public sealed class MsTestConfigurer : ExtensionConfigurerBase
     {
         [Persistent]

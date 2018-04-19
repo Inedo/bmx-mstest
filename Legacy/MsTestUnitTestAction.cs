@@ -12,6 +12,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
     [DisplayName("Execute MSTest Tests")]
     [Description("Runs MSTest unit tests on a specified test project, recommended for tests in VS 2010 and earlier.")]
     [CustomEditor(typeof(MsTestUnitTestActionEditor))]
+    [PersistFrom("Inedo.BuildMasterExtensions.MsTest.MsTestUnitTestAction,MsTest")]
     public sealed class MsTestUnitTestAction : UnitTestActionBase
     {
         private const string TestResultsFile = "mstestresults.xml";

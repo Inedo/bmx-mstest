@@ -24,6 +24,7 @@ namespace Inedo.BuildMasterExtensions.MsTest
     [CustomEditor(typeof(VsTestUnitTestActionEditor))]
     [RequiresInterface(typeof(IFileOperationsExecuter))]
     [ConvertibleToOperation(typeof(VsTestImporter))]
+    [PersistFrom("Inedo.BuildMasterExtensions.MsTest.VsTestUnitTestAction,MsTest")]
     public sealed class VsTestUnitTestAction : UnitTestActionBase
     {
         [Persistent]
